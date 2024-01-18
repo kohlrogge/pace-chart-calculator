@@ -212,7 +212,14 @@ p {
 
 #distanceUnitDisplay {
     margin-top: .5rem;
+}
 
+#clonedDiv {
+    left: -9999px;
+    position: absolute;
+    max-width: 50%;
+    height: auto;
+    width: 25%;
 }
 
 @media (max-width: 500px) {
