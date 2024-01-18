@@ -354,7 +354,7 @@ function generatePDF() {
     pdf.text('Pace Chart', 20, 10);
     const wrapperDiv = document.getElementById('paceChart');
     const clonedDiv = wrapperDiv.cloneNode(true);
-    clonedDiv.style.width = '15%';
+    clonedDiv.style.width = '10%';
     document.body.appendChild(clonedDiv);
     setTimeout(() => {
         html2canvas(clonedDiv).then((canvas) => {
