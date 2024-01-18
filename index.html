@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Pace Chart Maker</title>
+    <link href="styles.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div id="wrap-everything">
+        <div id="screen-one" class="active">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <h1>Welcome to the W1MP Pace Chart Maker!</h1>
+            <button id="first-butt" class="next-buttons" onclick="showNextScreen()">Next</button>
+        </div>
+        <div id="screen-two" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <h3>Will you be using miles or kilometers?</h3>
+            <div class="input-container">
+                <label>
+                    <input type="radio" name="distanceUnit" value="miles" checked required>
+                    Miles
+                </label>
+                <label>
+                    <input type="radio" name="distanceUnit" value="kilometers">
+                    Kilometers
+                </label>
+            </div>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button>
+                <button class="next-buttons" onclick="showNextScreen(); setIsMiles()">Next</button>
+            </div>
+        </div>
+        <div id="screen-three" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <h3>What is the EXACT distance of your race?</h3>
+            <div class="input-container">
+                <input type="number" id="raceDistance" class="distance-input" maxlength="8" oninput="validateDistance(this)">
+                <label for="raceDistance" id="distanceUnitDisplay"></label>
+            </div>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button> <button class="next-buttons" onclick="showNextScreen(); setRaceDistance()">Next</button>
+            </div>
+        </div>
+        <div id="screen-four" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <h3>What is the total cutoff time in race hours? (ie 32:00)</h3>
+            <div class="button-container">
+                <input type="number" id="cutoffTimeHours" maxlength="8" class="time-input"
+                    oninput="validateNumber(this)" placeholder="HH"> :
+                <input type="number" id="cutoffTimeMinutes" maxlength="8" class="time-input"
+                    oninput="validateTwoDigitInput(this)" placeholder="mm">
+            </div>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button>
+                <button class="next-buttons" onclick="showNextScreen(); setCutoffTimeInMinutes()">Next</button>
+            </div>
+        </div>
+        <div id="screen-five" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <h3>What is your goal time to finish the race in?</h3>
+            <div class="button-container">
+                <input type="number" id="goalTimeHours" class="time-input" maxlength="8" oninput="validateNumber(this)"
+                    placeholder="HH"> :
+                <input type="number" id="goalTimeMinutes" class="time-input" maxlength="8"
+                    oninput="validateTwoDigitInput(this)" placeholder="mm">
+            </div>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button>
+                <button class="next-buttons" onclick="showNextScreen(); setGoalTimeInMinutes()">Next</button>
+            </div>
+        </div>
+        <div id="screen-six" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <div id="buffer-time-wrap">
+                <h3>Buffer Time</h3>
+                <p>We reccommend also having a buffer time on your chart. This will give you something to strive to stay
+                    ahead of if you're not going to meet your
+                    goal time, but would like to have a buffer ahead of the final cutoff.</p>
+                <p>If you don't want this then leave
+                    blank and hit next.
+                </p>
+            </div>
+            <div class="input-container">
+                <input type="number" id="bufferTimeHours" class="time-input" maxlength="8"
+                    oninput="validateNumber(this)" placeholder="HH"> :
+                <input type="number" id="bufferTimeMinutes" class="time-input" maxlength="8"
+                    oninput="validateTwoDigitInput(this)" placeholder="mm">
+            </div>
+            <div id="buffer-buttons" class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button>
+                <button class="next-buttons" onclick="showNextScreen(); setBufferTimeInMinutes()">Next</button>
+            </div>
+        </div>
+        <div id="screen-seven" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <div id="chart-input-div">
+                <p>Enter the name of each aid station and its total distance from the start.<br>Only enter a cutoff if.
+                    there is a cutoff time for that aid station, otherwise we will calculate this based on the race's
+                    total cutoff time.
+                </p>
+                <div class="table-buttons">
+                    <button id="addRowBtn" onclick="addRow()">Add Row</button>
+                    <button id="addRowBtn" onclick="deleteRow()">Remove Row</button>
+                </div>
+            </div>
+            <table id="myTable" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th>Aid Station Name</th>
+                        <th>Distance</th>
+                        <th>Cutoffs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <input type="text" class="nameField name-input">
+                        </td>
+                        <td>
+                            <input type="number" class="distanceField as-distance-input" oninput="validateDistance(this)">
+                        </td>
+                        <td>
+                            <div id="as-input-times">
+                                <input type="number" class="asCutoffHours as-time-input" oninput="validateNumber(this)" placeholder="HH">:
+                                <input type="number" class="asCutOffMinutes as-time-input" placeholder="mm" oninput="validateNumber(this)">
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td class="nameField">Finish</td>
+                        <td id="raceDistanceDisplay"></td>
+                        <td id="finalCutOffDisplay"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="showPreviousScreen()">Previous</button>
+                <button onclick="showNextScreen(); makeThePaceChart()">Calculate</button>
+            </div>
+        </div>
+        <div id="screen-eight" class="screens">
+            <img class="mainlogo" src="images/mainlogo.png" alt="The Women's 100 Miler Project">
+            <table id="paceChart" style="text-align: center;">
+                <thead>
+                    <tr>
+                        <th>Aid Station Name</th>
+                        <th>Distance</th>
+                        <th>Goal Times</th>
+                        <th>Buffer Times</th>
+                        <th>Cutoff Times</th>
+                        <th id="cutoff-column"> Hard CutOff></th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="button-container">
+                <button class="prev-buttons" onclick="clearAidStationTable(); showPreviousScreen()">Previous</button>
+                <button onclick="generatePDF()">Print/Save Chart</button>
+                <button onclick="newChart()">New Chart</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
